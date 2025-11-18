@@ -20,7 +20,7 @@ public class Controller {
         return service.test();
     }
     @GetMapping("/my/{city}")
-    public Root WeatherData(@PathVariable String city){
+    public WeatherResponse WeatherData(@PathVariable String city){
         return service.getData(city);
     }
 
