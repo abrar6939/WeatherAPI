@@ -3,11 +3,19 @@ package com.prc.Weather_App.dto;
 
 
 public class Root {
+    // this location and current was already existed as we are now adding this 
+    //Forecast we have to change some fields
     public Location location;
     public Current current;
+    
+public ForeCast forecast;
 
-
-
+    public ForeCast getForecast() {
+        return forecast;
+    }
+    public void setForecast(ForeCast forecast) {
+        this.forecast = forecast;
+    }
 
 
     public Location getLocation() {

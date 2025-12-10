@@ -1,0 +1,797 @@
+
+
+## **TASK 1: Create `ForecastDay.java` - DETAILED EXPLANATION**
+
+### **Why do we need this class?**
+
+When the weather API returns forecast data, it gives us information about **multiple days**. Each day needs to be stored separately. `ForecastDay` is a container that holds:
+- **The date** (e.g., "2025-12-05")
+- **The weather data for that day** (max temp, condition, rain chance, etc.)
+
+Think of it like a **calendar day card** - one card per day with the date and forecast info.
+
+### **What does each part do?**
+
+```java
+package com.prc.Weather_App.dto;
+```
+- This declares the package where the class lives (same location as other DTOs)
+
+```java
+public class ForecastDay {
+```
+- Creates a public class named `ForecastDay` that can be used anywhere
+
+```java
+    public String date;
+    public Day day;
+```
+- `date` - stores the date as a String (e.g., "2025-12-05")
+- `day` - stores a `Day` object which contains all the weather details (temp, condition, rain, etc.)
+
+**Why separate them?**
+- `date` is just text, simple to store
+- `day` is complex (has temperature, condition, humidity, etc.), so we put it in its own `Day` class
+
+```java
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+```
+- **Getter** - allows other code to READ the date: `String myDate = forecastDay.getDate();`
+- **Setter** - allows other code to WRITE/SET the date: `forecastDay.setDate("2025-12-05");`
+
+**Why need both?**
+- Jackson (JSON library) uses these to convert JSON from API → Java object
+- When API sends JSON with `"date": "2025-12-05"`, Jackson calls `setDate()` automatically
+- When we return object to user, Jackson calls `getDate()` to convert back to JSON
+
+```java
+    public Day getDay() {
+        return day;
+    }
+
+    public void setDay(Day day) {
+        this.day = day;
+    }
+```
+- Same concept but for the `day` object (contains temperature, condition, etc.)
+
+---
+
+### **Real World Example**
+
+**API Response (JSON):**
+```json
+{
+  "date": "2025-12-05",
+  "day": {
+    "maxtemp_c": 25,
+    "mintemp_c": 15,
+    "condition": {"text": "Sunny"}
+  }
+}
+```
+
+**After Jackson converts to Java:**
+```
+ForecastDay object:
+  - date = "2025-12-05"
+  - day = Day object {
+      - maxtemp_c = 25
+      - mintemp_c = 15
+      - condition = Condition object {text = "Sunny"}
+    }
+```
+
+**How to use it in code:**
+```java
+ForecastDay day1 = forecast.getForecastday().get(0);  // Get first day
+String dateStr = day1.getDate();                        // "2025-12-05"
+double maxTemp = day1.getDay().getMaxtemp_c();         // 25
+```
+
+---
+
+### **Complete Code for `ForecastDay.java`:**
+
+```java
+package com.prc.Weather_App.dto;
+
+public class ForecastDay {
+    // Variables to hold date and day data
+    public String date;
+    public Day day;
+
+    // Getter for date
+    public String getDate() {
+        return date;
+    }
+
+    // Setter for date
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    // Getter for day
+    public Day getDay() {
+        return day;
+    }
+
+    // Setter for day
+    public void setDay(Day day) {
+        this.day = day;
+    }
+}
+```
+
+---
+
+### **What to do now:**
+
+1. Create a new file: `ForecastDay.java` in the `dto` folder
+2. Copy the code above
+3. Save it
+4. Send me a message when done, and I'll verify it!
+Great! Let me verify your file first, then move to the next task:
+
+Read [](file:///c%3A/Users/moham/Desktop/Weather-App/Weather-App/src/main/java/com/prc/Weather_App/dto/ForeCastDay.java)
+
+Perfect! ✓ Your ForeCastDay.java is correct! (Just note: you named it `ForeCastDay` with capital C, which is fine - just be consistent)
+
+Now let's move to **TASK 2: Create `Day.java`**
+
+Created 6 todos
+
+---
+
+## **TASK 2: Create `Day.java` - DETAILED EXPLANATION**
+
+### **What is the `Day` class?**
+
+`ForeCastDay` holds the date and a `Day` object. The `Day` object contains **all the weather details for that day**:
+- Maximum temperature
+- Minimum temperature
+- Average temperature
+- Weather condition (Sunny, Rainy, etc.)
+- Chance of rain
+- Chance of snow
+- etc.
+
+Think of it like: **ForeCastDay** = Date card, **Day** = Weather details card
+
+### **Why do we need it separate?**
+
+**Organization:** Weather data is complex with many fields. By putting it in its own class, we keep code clean and organized.
+
+**Reusability:** The `Day` class can be used in other places too (like when returning hourly forecast).
+
+### **What fields does `Day` have?**
+
+Based on WeatherAPI, here are the important fields:
+
+```
+maxtemp_c       → Maximum temperature in Celsius
+mintemp_c       → Minimum temperature in Celsius
+avgtemp_c       → Average temperature in Celsius
+maxtemp_f       → Maximum temperature in Fahrenheit
+mintemp_f       → Minimum temperature in Fahrenheit
+avgtemp_f       → Average temperature in Fahrenheit
+condition       → Condition object (Sunny, Rainy, etc.)
+chance_of_rain  → Percentage chance of rain (0-100)
+chance_of_snow  → Percentage chance of snow (0-100)
+totalprecip_mm  → Total precipitation in millimeters
+avgthumidity    → Average humidity percentage
+```
+
+### **Real Example**
+
+**API Response (JSON) for one day:**
+```json
+{
+  "maxtemp_c": 25,
+  "mintemp_c": 15,
+  "avgtemp_c": 20,
+  "maxtemp_f": 77,
+  "mintemp_f": 59,
+  "avgtemp_f": 68,
+  "condition": {"text": "Sunny", "icon": "//cdn.com/sunny.png"},
+  "chance_of_rain": 10,
+  "chance_of_snow": 0,
+  "totalprecip_mm": 0,
+  "avgthumidity": 65
+}
+```
+
+**In Java object:**
+```
+Day object:
+  - maxtemp_c = 25
+  - mintemp_c = 15
+  - avgtemp_c = 20
+  - condition = Condition {text: "Sunny"}
+  - chance_of_rain = 10
+  - etc.
+```
+
+### **Complete Code for `Day.java`:**
+
+```java
+package com.prc.Weather_App.dto;
+
+public class Day {
+    public double maxtemp_c;
+    public double mintemp_c;
+    public double avgtemp_c;
+    public double maxtemp_f;
+    public double mintemp_f;
+    public double avgtemp_f;
+    public Condition condition;
+    public int chance_of_rain;
+    public int chance_of_snow;
+    public double totalprecip_mm;
+    public int avgthumidity;
+
+    // Getters and Setters
+    public double getMaxtemp_c() {
+        return maxtemp_c;
+    }
+
+    public void setMaxtemp_c(double maxtemp_c) {
+        this.maxtemp_c = maxtemp_c;
+    }
+
+    public double getMintemp_c() {
+        return mintemp_c;
+    }
+
+    public void setMintemp_c(double mintemp_c) {
+        this.mintemp_c = mintemp_c;
+    }
+
+    public double getAvgtemp_c() {
+        return avgtemp_c;
+    }
+
+    public void setAvgtemp_c(double avgtemp_c) {
+        this.avgtemp_c = avgtemp_c;
+    }
+
+    public double getMaxtemp_f() {
+        return maxtemp_f;
+    }
+
+    public void setMaxtemp_f(double maxtemp_f) {
+        this.maxtemp_f = maxtemp_f;
+    }
+
+    public double getMintemp_f() {
+        return mintemp_f;
+    }
+
+    public void setMintemp_f(double mintemp_f) {
+        this.mintemp_f = mintemp_f;
+    }
+
+    public double getAvgtemp_f() {
+        return avgtemp_f;
+    }
+
+    public void setAvgtemp_f(double avgtemp_f) {
+        this.avgtemp_f = avgtemp_f;
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+    public int getChance_of_rain() {
+        return chance_of_rain;
+    }
+
+    public void setChance_of_rain(int chance_of_rain) {
+        this.chance_of_rain = chance_of_rain;
+    }
+
+    public int getChance_of_snow() {
+        return chance_of_snow;
+    }
+
+    public void setChance_of_snow(int chance_of_snow) {
+        this.chance_of_snow = chance_of_snow;
+    }
+
+    public double getTotalprecip_mm() {
+        return totalprecip_mm;
+    }
+
+    public void setTotalprecip_mm(double totalprecip_mm) {
+        this.totalprecip_mm = totalprecip_mm;
+    }
+
+    public int getAvgthumidity() {
+        return avgthumidity;
+    }
+
+    public void setAvgthumidity(int avgthumidity) {
+        this.avgthumidity = avgthumidity;
+    }
+}
+```
+
+---
+
+### **What to do now:**
+
+1. Create a new file: `Day.java` in the `dto` folder
+2. Copy the code above
+3. Save it
+4. Send me a message when done!
+Great! Let me verify your `Day.java` file:
+
+Read [](file:///c%3A/Users/moham/Desktop/Weather-App/Weather-App/src/main/java/com/prc/Weather_App/dto/Day.java#1-1), lines 1 to 100
+
+Perfect! ✓ Your Day.java is correct! Now let's move to **TASK 3: Create `Forecast.java`**
+
+Starting: *Create Forecast.java DTO* (3/6)
+
+---
+
+## **TASK 3: Create `Forecast.java` - DETAILED EXPLANATION**
+
+### **What is the `Forecast` class?**
+
+`Forecast` is a **container** that holds a **list of all forecast days**.
+
+Think of it like:
+- `ForeCastDay` = One day's card
+- `Day` = Weather details on that card
+- `Forecast` = **Album of all the day cards** (holds multiple ForeCastDay objects)
+
+### **Why do we need it?**
+
+When you request a 5-day forecast, the API returns all 5 days together in a structure. We need a class to hold all those days in a list.
+
+### **What does it contain?**
+
+```
+forecastday → List of ForeCastDay objects
+```
+
+**Example:** If you request 5 days forecast:
+```
+Forecast object:
+  - forecastday = [
+      ForeCastDay {date: "2025-12-05", day: {...}},
+      ForeCastDay {date: "2025-12-06", day: {...}},
+      ForeCastDay {date: "2025-12-07", day: {...}},
+      ForeCastDay {date: "2025-12-08", day: {...}},
+      ForeCastDay {date: "2025-12-09", day: {...}}
+    ]
+```
+
+### **Real Example from API**
+
+**JSON response:**
+```json
+{
+  "forecast": {
+    "forecastday": [
+      {
+        "date": "2025-12-05",
+        "day": {...}
+      },
+      {
+        "date": "2025-12-06",
+        "day": {...}
+      }
+    ]
+  }
+}
+```
+
+### **What is `List<ForeCastDay>`?**
+
+- `List` = A collection that can hold multiple items in order
+- `<ForeCastDay>` = Each item in the list is a `ForeCastDay` object
+- Think of it like an **array** but more powerful
+
+**Example usage:**
+```java
+Forecast forecast = ...;
+List<ForeCastDay> days = forecast.getForecastday();
+ForeCastDay firstDay = days.get(0);      // Get first day
+String date = firstDay.getDate();        // "2025-12-05"
+double maxTemp = firstDay.getDay().getMaxtemp_c();  // 25
+```
+
+### **Complete Code for `Forecast.java`:**
+
+```java
+package com.prc.Weather_App.dto;
+
+import java.util.List;
+
+public class Forecast {
+    public List<ForeCastDay> forecastday;
+
+    // Getter
+    public List<ForeCastDay> getForecastday() {
+        return forecastday;
+    }
+
+    // Setter
+    public void setForecastday(List<ForeCastDay> forecastday) {
+        this.forecastday = forecastday;
+    }
+}
+```
+
+**Important:** Notice the `import java.util.List;` at the top - this is needed to use the List class!
+
+---
+
+### **What to do now:**
+
+1. Create a new file: `Forecast.java` in the `dto` folder
+2. Copy the code above (including the import statement!)
+3. Save it
+4. Send me a message when done!
+Sure! Let me continue with **TASK 4: Update Root.java**
+
+---
+
+## **TASK 4: Update Root.java - DETAILED EXPLANATION**
+
+### **What needs to change?**
+
+Currently, your Root.java has:
+```java
+public Location location;
+public Current current;
+```
+
+We need to **add** a new field:
+```java
+public ForeCast forecast;  // ← ADD THIS
+```
+
+### **Why?**
+
+Remember the API response structure? It has THREE parts:
+1. `location` - City information ✓ (already have)
+2. `current` - Current weather ✓ (already have)
+3. `forecast` - Forecast data ✗ (NEED TO ADD)
+
+So when Jackson receives the JSON from the API, it needs a place to put the forecast data. That's why we add this field!
+
+### **What also needs to be added?**
+
+For Jackson to work properly, we need **getter and setter** for the forecast field:
+
+```java
+public ForeCast getForecast() {
+    return forecast;
+}
+
+public void setForecast(ForeCast forecast) {
+    this.forecast = forecast;
+}
+```
+
+### **Complete updated Root.java:**
+
+```java
+package com.prc.Weather_App.dto;
+
+public class Root {
+    public Location location;
+    public Current current;
+    public ForeCast forecast;  // ← NEW LINE
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public Current getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Current current) {
+        this.current = current;
+    }
+
+    // ← ADD THESE NEW LINES
+    public ForeCast getForecast() {
+        return forecast;
+    }
+
+    public void setForecast(ForeCast forecast) {
+        this.forecast = forecast;
+    }
+}
+```
+
+### **Step-by-step what to do:**
+
+1. Open your Root.java file
+2. Add this line after `public Current current;`:
+   ```java
+   public ForeCast forecast;
+   ```
+3. Add the getter and setter methods at the end (before the closing `}`)
+4. Save the file
+5. Send me a message when done!
+Let me verify your updated Root.java file:
+
+Read [](file:///c%3A/Users/moham/Desktop/Weather-App/Weather-App/src/main/java/com/prc/Weather_App/dto/Root.java)
+
+Perfect! ✓ Your Root.java is updated correctly! Now let's move to **TASK 5: Add `getForecast` method to WeatherService.java**
+
+Created 6 todos
+
+---
+
+## **TASK 5: Add `getForecast` method to WeatherService.java - DETAILED EXPLANATION**
+
+### **What is this method?**
+
+This method will **fetch forecast data from the Weather API** and return it to the controller.
+
+### **How does it work?**
+
+**Step 1:** Build the URL with parameters
+```
+Base URL: https://api.weatherapi.com/v1/forecast.json
+Parameters:
+  - key = your_api_key
+  - q = city_name
+  - days = number_of_days (1-10)
+
+Final URL: https://api.weatherapi.com/v1/forecast.json?key=abc123&q=London&days=5
+```
+
+**Step 2:** Call the API using RestTemplate
+```java
+Root response = template.getForObject(url, Root.class);
+```
+- `template.getForObject()` makes an HTTP GET request to the URL
+- It converts the JSON response to a `Root` object automatically
+
+**Step 3:** Extract forecast data and return it
+```java
+return response != null ? response.getForecast() : null;
+```
+- Get only the forecast part from the Root object
+- Return null if response is empty (error handling)
+
+### **Real Example**
+
+**API Call:**
+```
+GET /weather/forecast/London?days=5
+```
+
+**Service Method processes:**
+1. Builds URL: `https://api.weatherapi.com/v1/forecast.json?key=XXX&q=London&days=5`
+2. Calls API, gets Root object with location, current, AND forecast
+3. Extracts only forecast: `response.getForecast()`
+4. Returns it to controller
+
+### **Complete Code for WeatherService.java:**
+
+Add this new method to your existing WeatherService.java:
+
+```java
+public ForeCast getForecast(String city, int days) {
+    String url = apiurl + "?key=" + apikey + "&q=" + city + "&days=" + days;
+    Root response = template.getForObject(url, Root.class);
+    return response != null ? response.getForecast() : null;
+}
+```
+
+**Explanation:**
+- `String city` - which city to get forecast for
+- `int days` - how many days of forecast (1-10)
+- `apiurl` - base URL (from application.properties)
+- `apikey` - API key (from application.properties)
+- `&days=` - tells the API to include forecast data
+- `response.getForecast()` - extracts only forecast from response
+- `return null` - if no response, return null (error handling)
+
+### **Where to add it?**
+
+In your WeatherService.java, add this method after your existing `getData()` method. Your file should look like:
+
+```java
+@Service
+public class WeatherService {
+    // ... existing code ...
+
+    public String test(){
+        return "ALL Good";
+    }
+
+    public Root getData(String city){
+        String url = apiurl+"?key="+apikey+"&q="+city;
+        Root response = template.getForObject(url, Root.class);
+        return response;
+    }
+
+    // ← ADD THIS NEW METHOD HERE
+    public ForeCast getForecast(String city, int days) {
+        String url = apiurl + "?key=" + apikey + "&q=" + city + "&days=" + days;
+        Root response = template.getForObject(url, Root.class);
+        return response != null ? response.getForecast() : null;
+    }
+}
+```
+
+### **What to do now:**
+
+1. Open your WeatherService.java file
+2. Add the `getForecast` method (above)
+3. Save the file
+4. Send me a message when done!
+Let me verify your WeatherService.java is fixed:
+
+Read [](file:///c%3A/Users/moham/Desktop/Weather-App/Weather-App/src/main/java/com/prc/Weather_App/service/WeatherService.java#1-1), lines 1 to 44
+
+Perfect! ✓ Your WeatherService.java is fixed correctly! Now let's move to the **FINAL TASK 6: Add forecast endpoint to Controller.java**
+
+Starting: *Add forecast endpoint to Controller* (6/6)
+
+---
+
+## **TASK 6: Add Forecast Endpoint to Controller.java - DETAILED EXPLANATION**
+
+### **What is this endpoint?**
+
+This is the **REST API endpoint** that users will call to get forecast data. It's like the "front door" to your forecast service.
+
+### **How will users call it?**
+
+Examples:
+```
+GET /weather/forecast/London              → 5 days forecast (default)
+GET /weather/forecast/London?days=7       → 7 days forecast
+GET /weather/forecast/Paris?days=3        → 3 days forecast
+GET /weather/forecast/Tokyo?days=10       → 10 days forecast
+```
+
+### **What does each part mean?**
+
+```java
+@GetMapping("/forecast/{city}")
+```
+- `@GetMapping` - handles HTTP GET requests
+- `/forecast/{city}` - the URL path
+  - `/forecast/` - fixed part
+  - `{city}` - variable part (London, Paris, Tokyo, etc.)
+
+```java
+public ForeCast getForecast(@PathVariable String city,
+                            @RequestParam(defaultValue = "5") int days)
+```
+- `public ForeCast` - returns a ForeCast object
+- `@PathVariable String city` - gets city from URL (e.g., `/forecast/London` → city="London")
+- `@RequestParam(defaultValue = "5") int days` - gets `days` from query parameter
+  - `?days=7` → days=7
+  - If no `?days=`, use default value 5
+
+```java
+{
+    return service.getForecast(city, days);
+}
+```
+- Calls the service method we just created
+- Passes city and days
+- Returns the ForeCast object as JSON
+
+### **Real Example - Step by Step**
+
+**User makes request:**
+```
+GET /weather/forecast/London?days=7
+```
+
+**What happens:**
+1. Controller receives the request
+2. Extracts `city = "London"` from URL path
+3. Extracts `days = 7` from query parameter
+4. Calls: `service.getForecast("London", 7)`
+5. Service builds URL: `https://api.weatherapi.com/v1/forecast.json?key=XXX&q=London&days=7`
+6. Gets JSON response from API
+7. Converts to ForeCast object
+8. Controller sends back as JSON response
+
+**Response (JSON):**
+```json
+{
+  "forecastday": [
+    {
+      "date": "2025-12-05",
+      "day": {
+        "maxtemp_c": 25,
+        "mintemp_c": 15,
+        "avgtemp_c": 20,
+        "condition": {"text": "Sunny"}
+      }
+    },
+    {
+      "date": "2025-12-06",
+      "day": {
+        "maxtemp_c": 22,
+        "mintemp_c": 12,
+        "avgtemp_c": 17,
+        "condition": {"text": "Rainy"}
+      }
+    }
+  ]
+}
+```
+
+### **Complete Code for Controller.java:**
+
+Add this new method to your existing Controller.java:
+
+```java
+@GetMapping("/forecast/{city}")
+public ForeCast getForecast(@PathVariable String city,
+                            @RequestParam(defaultValue = "5") int days) {
+    return service.getForecast(city, days);
+}
+```
+
+**Your Controller should look like:**
+
+```java
+@RestController
+@RequestMapping("/weather")
+public class Controller {
+    @Autowired
+    private WeatherService service;
+
+    @GetMapping("/{city}")
+    public String getWeatherData(@PathVariable String city){
+        return service.test();
+    }
+
+    @GetMapping("/my/{city}")
+    public Root WeatherData(@PathVariable String city){
+        return service.getData(city);
+    }
+
+    // ← ADD THIS NEW METHOD HERE
+    @GetMapping("/forecast/{city}")
+    public ForeCast getForecast(@PathVariable String city,
+                                @RequestParam(defaultValue = "5") int days) {
+        return service.getForecast(city, days);
+    }
+}
+```
+
+**Important:** Make sure you have this import at the top:
+```java
+import com.prc.Weather_App.dto.ForeCast;
+```
+
+### **What to do now:**
+
+1. Open your Controller.java file
+2. Add the import for `ForeCast` at the top
+3. Add the new `getForecast` method (above)
+4. Save the file
+5. Send me a message when done!

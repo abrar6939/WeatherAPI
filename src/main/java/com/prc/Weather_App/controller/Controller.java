@@ -1,13 +1,19 @@
 package com.prc.Weather_App.controller;
 
+import com.prc.Weather_App.dto.Current;
+import com.prc.Weather_App.dto.ForeCast;
 import com.prc.Weather_App.dto.Root;
-import com.prc.Weather_App.dto.WeatherResponse;
 import com.prc.Weather_App.service.WeatherService;
+
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/weather")
@@ -20,8 +26,21 @@ public class Controller {
         return service.test();
     }
     @GetMapping("/my/{city}")
-    public WeatherResponse WeatherData(@PathVariable String city){
+    public Root WeatherData(@PathVariable String city){
         return service.getData(city);
     }
+
+    @GetMapping("/current/{city}")
+    public Current getCurrentWeatherEndpoint(@PathVariable String city) {
+        return service.getCurrentWeather(city);
+    }
+    
+    @GetMapping("/forecast/{city}")
+public ForeCast getForecast(@PathVariable String city, 
+                            @RequestParam(defaultValue = "5") int days) {
+    return service.getForecast(city, days);
+}
+    
+
 
 }

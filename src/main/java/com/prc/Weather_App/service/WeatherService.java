@@ -1,14 +1,11 @@
 package com.prc.Weather_App.service;
 
+import com.prc.Weather_App.dto.Current;
+import com.prc.Weather_App.dto.ForeCast;
 import com.prc.Weather_App.dto.Root;
-import com.prc.Weather_App.dto.WeatherResponse;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class WeatherService {
@@ -26,21 +23,22 @@ public class WeatherService {
         return "ALL Good";
     }
 
-   public WeatherResponse getData(String city){
+   public Root getData(String city){
         String url = apiurl+"?key="+apikey+"&q="+city;
-        Root response = template.getForObject(url, Root.class);
-        WeatherResponse weatherResponse = new WeatherResponse();
+       Root response = template.getForObject(url, Root.class);
+       return response;
+   }
+   //T1
+   public Current getCurrentWeather(String city){
+    Root root = getData(city);
+    return root != null ? root.getCurrent() : null;
 
-        weatherResponse.setCity(response.getLocation().name);
-        weatherResponse.setRegion(response.getLocation().region);
-        weatherResponse.setCountry(response.getLocation().country);
-
-        String condition = response.getCurrent().getCondition().getText();
-        weatherResponse.setCondition(condition);
-        weatherResponse.setTemperature(response.getCurrent().getTemp_c());
-        return weatherResponse;
-
-
-       }
    }
 
+   public ForeCast getForecast(String city, int days){
+    String url = apiurl+"?key="+apikey+"&q="+city +"&days=" + days;
+    Root response = template.getForObject(url, Root.class);
+    return response != null ? response.getForecast() : null;
+
+   }
+}
